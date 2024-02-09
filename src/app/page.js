@@ -32,12 +32,29 @@ export default function Home() {
     setCountriesList({ isLoading: false, data: filteredCountries });
     console.log('search', searchTerm);
     setSearchTerm('');
+  };
+
+  const handleReset = async () => {
+    try {
+      const response = await fetch('https://restcountries.com/v3.1/all');
+      if (!response.ok) {
+        setCountriesList({ ...countriesList, isLoading: false });
+        throw new Error('Failed to fetch data');
+      } else {
+        const data = await response.json();
+        console.log(data);
+        setCountriesList({ data: data, isLoading: false });
+      }
+    } catch (error) {
+      console.log(error);
+      setCountriesList({ ...countriesList, isLoading: false });
+    }
   }
 
   return (
     <main className="flex min-h-screen flex-col p-2 sm:p-24">
-      <div>
-        <form onSubmit={handleSubmit} className="flex gap-x-3 align-middle mb-6">
+      <div className="flex gap-x-3 align-middle mb-6">
+        <form >
           <div className="gap-x-3 items-center">
             <input type="text" value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -45,8 +62,9 @@ export default function Home() {
               placeholder="Enter country name..."
             />
           </div>
-          <button className="text-white bg-teal-600 px-2 border rounded-md text-sm">Search</button>
         </form>
+        <button onClick={handleSubmit} className="text-white bg-teal-600 px-2 border rounded-md text-sm">Search</button>
+        <button onClick={handleReset} className="text-white bg-teal-600 px-2 border rounded-md text-sm">Reset</button>
       </div>
       {!countriesList.isLoading && (
         <div className="flex flex-col gap-y-8">
